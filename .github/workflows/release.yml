@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build app
+        run: make app
+
+      - name: Verify app bundle
+        run: |
+          test -d build/SmartBarHide.app
+          codesign --verify --deep --strict --verbose=2 build/SmartBarHide.app
+
+      - name: Package app
+        run: |
+          mkdir -p dist
+
+          ditto \
+            -c -k \
+            --sequesterRsrc \
+            --keepParent \
+            build/SmartBarHide.app \
+            "dist/SmartBarHide-${GITHUB_REF_NAME}.zip"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "dist/SmartBarHide-${GITHUB_REF_NAME}.zip" \
+            --verify-tag \
+            --generate-notes \
+            --title "SmartBarHide ${GITHUB_REF_NAME}"
