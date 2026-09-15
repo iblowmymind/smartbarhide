@@ -39,4 +39,8 @@ SmartBarHide.app/Contents/MacOS/SmartBarHide --quit
 Issues and PR's are welcome! This code is licensed under the MIT license, refer to LICENSE for details.
 
 ## Changelog
-- 0.1 (2026-09-14): Initial release
+### 0.1.1 (2026-09-15)
+Add more checks for menu bar state restore to (hopefully) mitigate a bug
+
+### 0.1.0 (2026-09-14)
+Initial release
