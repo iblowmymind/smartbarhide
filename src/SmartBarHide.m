@@ -45,8 +45,8 @@ static int SBSendCommand(const char *command) {
         size_t archSize = 0; sysctlbyname("hw.machine", NULL, &archSize, NULL, 0);
         char machine[64] = {0}; if (archSize > 0 && archSize < sizeof(machine)) sysctlbyname("hw.machine", machine, &archSize, NULL, 0);
         NSString *arch = [NSString stringWithUTF8String:machine] ?: @"unknown";
-        if (strcmp(build, "25G83") != 0 || ![arch hasPrefix:@"arm64"]) {
-            NSLog(@"Warning: Tested only on arm64 macOS build 25G83 (found %s %s), continuing anyway!", arch.UTF8String, build);
+        if ((strcmp(build, "25G83") != 0 && strcmp(build, "26A428") != 0) || ![arch hasPrefix:@"arm64"]) {
+            NSLog(@"Warning: Untested macOS version (found %s %s); continuing anyway.", arch.UTF8String, build);
         }
         _sky = dlopen("/System/Library/PrivateFrameworks/SkyLight.framework/SkyLight", RTLD_NOW | RTLD_LOCAL);
         _mainConnection = (SBMainConnectionFn)dlsym(_sky, "SLSMainConnectionID");
@@ -172,6 +172,8 @@ static NSArray<SBTarget *> *SBDisplays(void) {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(screenChanged:) name:NSApplicationDidChangeScreenParametersNotification object:nil];
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(willSleep:) name:NSWorkspaceWillSleepNotification object:nil];
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(didWake:) name:NSWorkspaceDidWakeNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(wakeRefresh:) name:NSWorkspaceScreensDidWakeNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(wakeRefresh:) name:NSWorkspaceSessionDidBecomeActiveNotification object:nil];
     signal(SIGTERM, SIG_IGN); signal(SIGINT, SIG_IGN);
     self.terminationSignal = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGTERM, 0, dispatch_get_main_queue());
     __weak typeof(self) weakSelf = self;
@@ -240,9 +242,9 @@ static NSArray<SBTarget *> *SBDisplays(void) {
     [self updateSettings];
 }
 - (void)screenChanged:(NSNotification *)n {
-    // WindowServer invalidates these per-display overrides when the display
-    // topology changes. Coalesce the notification burst, discard the stale
-    // applied cache, then apply every saved per-name state to the fresh list.
+    // Display changes can invalidate these per-display overrides; screen and
+    // session wake may do the same. Coalesce the event burst, discard the stale
+    // applied cache, and reapply saved states to the fresh display list.
     if (self.screenRefreshScheduled) return;
     self.screenRefreshScheduled = YES;
     __weak typeof(self) weakSelf = self;
@@ -253,7 +255,8 @@ static NSArray<SBTarget *> *SBDisplays(void) {
     });
 }
 - (void)willSleep:(NSNotification *)n { for (SBTarget *display in self.appliedByName.allValues) [self.api setVisible:NO display:display.displayID]; [self.appliedByName removeAllObjects]; }
-- (void)didWake:(NSNotification *)n { [self reconcile]; }
+- (void)didWake:(NSNotification *)n { [self screenChanged:n]; }
+- (void)wakeRefresh:(NSNotification *)n { [self screenChanged:n]; }
 - (void)terminateNormally { if (NSApp.isRunning) [NSApp terminate:nil]; }
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender { for (SBTarget *display in self.appliedByName.allValues) [self.api setVisible:NO display:display.displayID]; [self.appliedByName removeAllObjects]; return NSTerminateNow; }
 - (void)dealloc { if (self.terminationSignal) dispatch_source_cancel(self.terminationSignal); if (self.controlSource) dispatch_source_cancel(self.controlSource); if (self.controlSocket >= 0) { close(self.controlSocket); unlink(SBControlPath().fileSystemRepresentation); } if (self.lockFD >= 0) close(self.lockFD); [[NSNotificationCenter defaultCenter] removeObserver:self]; [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self]; }
