@@ -8,6 +8,7 @@ Modern MacBooks have notches. External displays do not. Default behavior of hidi
 This program uses an undocumented private macOS API's to achieve this: SLSSetMenuBarVisibilityOverrideOnDisplay from SkyLight. It was verified to be working on:
 - macOS 26.6.2 (25G83) on Apple Silicon
 - macOS 27.0 (26A428)
+
 Please let me know if you encounter any issues on other versions!
 
 ## Building
