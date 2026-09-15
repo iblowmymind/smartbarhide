@@ -2,10 +2,11 @@
 A utility to configure menu bar hiding behavior per-display for macOS.
 
 ## Why?
-Modern MacBooks have notches. External displays do not. Default behavior of hiding the menu bar when an app is fullscreen makes sense on regular, rectangular displays, but not on notched displays as you get this big, ugly black bar of wasted space where you can just as easily still put your menu bar for quick glances at menu bar icons without having to hover your mouse over the top. There is a way to always show the menu bar but that does that on all displays which means you give up on space unnecessarily on monitors . There is no documented, public way of configuring this behavior per-display.
+Modern MacBooks have notches. External displays do not. Default behavior of hiding the menu bar when an app is fullscreen makes sense on regular, rectangular displays, but not on notched displays as you get this big, ugly black bar of wasted space where you can just as easily still put your menu bar for quick glances at menu bar icons without having to hover your mouse over the top. There is a way to always show the menu bar but that does that on all displays which means you give up on space unnecessarily on monitors. There is no documented, public way of configuring this behavior per-display.
 
 ## Compatibility Warning
 This program uses an undocumented private macOS API's to achieve this: SLSSetMenuBarVisibilityOverrideOnDisplay from SkyLight. It was verified to be working on:
+
 - macOS 26.6.2 (25G83) on Apple Silicon
 - macOS 27.0 (26A428)
 
