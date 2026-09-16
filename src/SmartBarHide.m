@@ -109,15 +109,20 @@ static NSArray<SBTarget *> *SBDisplays(void) {
         window.title = @"SmartBarHide Settings"; window.delegate = self; window.releasedWhenClosed = NO;
         NSView *content = window.contentView;
         NSTextField *title = [NSTextField labelWithString:@"SmartBarHide"]; title.font = [NSFont boldSystemFontOfSize:24];
+        NSString *appVersion = [NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"] ?: @"Unknown";
+        NSTextField *version = [NSTextField labelWithString:[@"Version " stringByAppendingString:appVersion]];
+        version.font = [NSFont systemFontOfSize:NSFont.smallSystemFontSize]; version.textColor = NSColor.secondaryLabelColor;
         NSTextField *subtitle = [NSTextField labelWithString:@"Choose which detected displays keep their real menu bar visible."]; subtitle.textColor = NSColor.secondaryLabelColor;
         _status = [NSTextField labelWithString:@"Starting…"]; _status.textColor = NSColor.secondaryLabelColor;
         _rows = [NSStackView new]; _rows.orientation = NSUserInterfaceLayoutOrientationVertical; _rows.alignment = NSLayoutAttributeLeading; _rows.spacing = 10;
         _login = [NSButton checkboxWithTitle:@"Launch at login" target:self action:@selector(toggleLogin:)];
         NSButton *reset = [NSButton buttonWithTitle:@"Disable and Reset" target:self action:@selector(disable:)];
         NSButton *quit = [NSButton buttonWithTitle:@"Quit SmartBarHide" target:NSApp action:@selector(terminate:)];
-        for (NSView *v in @[title, subtitle, _rows, _status, _login, reset, quit]) { v.translatesAutoresizingMaskIntoConstraints = NO; [content addSubview:v]; }
+        for (NSView *v in @[title, version, subtitle, _rows, _status, _login, reset, quit]) { v.translatesAutoresizingMaskIntoConstraints = NO; [content addSubview:v]; }
         [NSLayoutConstraint activateConstraints:@[
             [title.leadingAnchor constraintEqualToAnchor:content.leadingAnchor constant:28], [title.topAnchor constraintEqualToAnchor:content.topAnchor constant:28],
+            [version.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-28], [version.firstBaselineAnchor constraintEqualToAnchor:title.firstBaselineAnchor],
+            [version.leadingAnchor constraintGreaterThanOrEqualToAnchor:title.trailingAnchor constant:16],
             [subtitle.leadingAnchor constraintEqualToAnchor:title.leadingAnchor], [subtitle.topAnchor constraintEqualToAnchor:title.bottomAnchor constant:6],
             [_rows.leadingAnchor constraintEqualToAnchor:title.leadingAnchor], [_rows.trailingAnchor constraintEqualToAnchor:content.trailingAnchor constant:-28], [_rows.topAnchor constraintEqualToAnchor:subtitle.bottomAnchor constant:28],
             [_status.leadingAnchor constraintEqualToAnchor:title.leadingAnchor], [_status.topAnchor constraintEqualToAnchor:_rows.bottomAnchor constant:15],

@@ -20,7 +20,10 @@ make app
 ## Usage
 **Make sure "Automatically hide and show the menu bar" in macOS System Settings > Menu Bar is set to the default value, "In Full Screen Only".**
 
-You may have to allow the app to run from System Settings > Privacy and Security, depending on your security settings.
+You may have to allow the app from System Settings > Privacy & Security or clear the quarantine attribute using this command to allow it to run:
+```sh
+xattr -rd com.apple.quarantine /Applications/SmartBarHide.app
+```
 
 Launch the app once and it runs in the background, launch it again to reveal a settings menu with toggles for all detected displays.
 
@@ -40,8 +43,12 @@ SmartBarHide.app/Contents/MacOS/SmartBarHide --quit
 Issues and PR's are welcome! This code is licensed under the MIT license, refer to LICENSE for details.
 
 ## Changelog
+### 0.1.2 (2026-09-16)
+- Add app icon
+- Add version string to settings window
+
 ### 0.1.1 (2026-09-15)
-Add more checks for menu bar state restore to (hopefully) mitigate a bug
+- Add more checks for menu bar state restore to (hopefully) mitigate a bug
 
 ### 0.1.0 (2026-09-14)
-Initial release
+- Initial release
