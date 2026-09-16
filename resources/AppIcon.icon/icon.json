@@ -5,6 +5,7 @@
   "fill" : "automatic",
   "groups" : [
     {
+      "blur-material" : null,
       "layers" : [
         {
           "fill" : "none",
