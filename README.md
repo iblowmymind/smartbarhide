@@ -43,6 +43,9 @@ SmartBarHide.app/Contents/MacOS/SmartBarHide --quit
 Issues and PR's are welcome! This code is licensed under the MIT license, refer to LICENSE for details.
 
 ## Changelog
+### 0.1.3 (2026-09-16)
+- Fix build
+
 ### 0.1.2 (2026-09-16)
 - Add app icon
 - Add version string to settings window
